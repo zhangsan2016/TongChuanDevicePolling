@@ -24,14 +24,11 @@ public class UdpBroadcast {
 	private Thread thread;
 	private Receive rec;
 	private PacketRec packetFrame;
-	Map<String, SingleDeviceFrame> mapSingle;
-	Map<String, SingleLightSingleJFrame> mapSingles;
 	/**
 	 * 单灯设备界面
 	 */
 	private PacketRec singleDeviceFrame;
 	DatagramPacket out;
-	SingleLightSingleJFrame sDevFrame;
 	long LastTime = 0;
 	int getTime =0;
 	private UdpBroadcast() {
@@ -109,9 +106,7 @@ public class UdpBroadcast {
 
 	}
 
-	public void setMapSingle(Map<String, SingleLightSingleJFrame> mapSingle){
-	    this.mapSingles = mapSingle;
-	}
+
 	public void sendData(final String ip, final int port, final byte[] data)
 			throws Exception {
 		new Thread(new Runnable() {
@@ -240,33 +235,7 @@ public class UdpBroadcast {
 
 	}
 
-	/**
-	 * @throws Exception
-	 * @author CJK
-	 * @category
-	 
-	 */
-	public void sendData(final String ip, final int port, final byte[] allData,
-			final Map<String, SingleDeviceFrame> mapSingle) throws Exception {
-		// TODO Auto-generated method stub
-		try {
-			this.mapSingle = mapSingle;
-			InetAddress hostAddress;
-			hostAddress = InetAddress.getByName(ip);
-			out = new DatagramPacket(allData,
-					allData.length, hostAddress, port);
-			if (detectSocket != null) {
-				detectSocket.send(out);							
-			}
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
 
-	}
 	
 	
 	/**
@@ -300,38 +269,5 @@ public class UdpBroadcast {
 
 	}
 	
-	public void sendsingleData(final String ip, final int port, final byte[] allData,
-			final Map<String, SingleLightSingleJFrame> mapSingle) throws Exception {
-		// TODO Auto-generated method stub
-		try {
-			this.mapSingles = mapSingle;
-			InetAddress hostAddress;
-			hostAddress = InetAddress.getByName(ip);
-			out = new DatagramPacket(allData,
-					allData.length, hostAddress, port);
-			/*if(thread.isInterrupted()){
-                thread.start();
-            }*/
-			if (detectSocket != null) {
-	/*			new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {*/
-							detectSocket.send(out);
-				/*		} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}).start();*/
-			}
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
 
-	}
 }
