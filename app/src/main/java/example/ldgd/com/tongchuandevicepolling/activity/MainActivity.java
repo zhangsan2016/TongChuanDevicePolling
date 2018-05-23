@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import java.io.IOException;
@@ -26,11 +27,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void reBoot(View view) throws IOException, InterruptedException {
+        Log.e("xx","sfdsdf");
         String[] arrayRestart = {"su", "-c", "reboot"};
         closePhone(MainActivity.this, arrayRestart);
 
 
-      /*  Process proc =Runtime.getRuntime().exec(new String[]{"su","-c","reboot "});
+/*      Process proc =Runtime.getRuntime().exec(new String[]{"su","-c","reboot "});
         proc.waitFor();*/
 
         /*try {
@@ -68,5 +70,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+    }
 }

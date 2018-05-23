@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import example.ldgd.com.tongchuandevicepolling.R;
+import example.ldgd.com.tongchuandevicepolling.activity.MainActivity;
 
 /**
  * Created by ldgd on 2018/5/22.
@@ -19,6 +20,8 @@ import example.ldgd.com.tongchuandevicepolling.R;
 
 public class DeviceService extends Service {
 
+
+    private static final int NOTIFY_ID = 10;
 
     @Nullable
     @Override
@@ -28,9 +31,9 @@ public class DeviceService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-     //   flags = START_STICKY;
-         flags = START_STICKY;
-
+        // 设置为前台进程
+        useForeground("铜川设备轮询服务开启，每45分钟轮询一次！","铜川设备轮询服务开启，每45分钟轮询一次！");
+        flags = START_STICKY;
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -102,13 +105,42 @@ public class DeviceService extends Service {
         alertDialog.show();
     }*/
 
+
+    public void useForeground(CharSequence tickerText, String currSong) {
+        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
+    /* Method 01
+     * this method must SET SMALLICON!
+     * otherwise it can't do what we want in Android 4.4 KitKat,
+     * it can only show the application info page which contains the 'Force Close' button.*/
+        NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setTicker(tickerText)
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(currSong)
+                .setContentIntent(pendingIntent);
+        Notification notification = mNotifyBuilder.build();
+
+    /* Method 02
+    Notification notification = new Notification(R.drawable.ic_launcher, tickerText,
+            System.currentTimeMillis());
+    notification.setLatestEventInfo(PlayService.this, getText(R.string.app_name),
+            currSong, pendingIntent);
+    */
+
+        startForeground(NOTIFY_ID, notification);
+    }
+
     @Override
     public void onDestroy() {
-        stopForeground(true);
+
         Intent intent = new Intent("com.ldgd.service.destroy");
         sendBroadcast(intent);
-        Log.e("xxx","Override\n" +
+        Log.e("xxx", "Override\n" +
                 "    public void onDestroy");
         super.onDestroy();
+        // 关闭前台进程
+        stopForeground(true);
     }
 }
