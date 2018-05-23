@@ -1,6 +1,7 @@
 package example.ldgd.com.tongchuandevicepolling.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.View;
 import java.io.IOException;
 
 import example.ldgd.com.tongchuandevicepolling.R;
+import example.ldgd.com.tongchuandevicepolling.service.DeviceService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +18,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // 开启服务
+        Intent deviceService = new Intent(this, DeviceService.class);
+        startService(deviceService);
 
     }
 

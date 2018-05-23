@@ -7,11 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import example.ldgd.com.tongchuandevicepolling.basic.BasicProtocol;
 import example.ldgd.com.tongchuandevicepolling.interfaces.PacketRec;
 import example.ldgd.com.tongchuandevicepolling.util.CheckCRC;
 import example.ldgd.com.tongchuandevicepolling.util.Converter;
@@ -75,13 +71,7 @@ public class UdpBroadcast {
 	            }).start();
 
 		} catch (UnknownHostException e) {
-
 			e.printStackTrace();
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-
 		}
 
 		rec = new Receive();
@@ -132,9 +122,6 @@ public class UdpBroadcast {
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO: handle exception
-					e.printStackTrace();
 				}
 
 			}
@@ -142,7 +129,7 @@ public class UdpBroadcast {
 
 	}
 
-	class Receive implements Runnable {		
+	class Receive implements Runnable {
 		boolean flag = true;
 		@Override
 		public void run() {
@@ -188,7 +175,7 @@ public class UdpBroadcast {
 								System.out.println("packetFrame = SingleDeviceFrame"  );
 							}*/
 							} else {		
-							    if(data[8]== BasicProtocol.FunctionType.reREADALARMSTATUS ){
+							   /* if(data[8]== BasicProtocol.FunctionType.reREADALARMSTATUS ){
                                     packetFrame.Receive( Arrays.copyOfRange(packet.getData(), 0,packet.getLength()), packet,sessions);
                                 }else if(data[8] == 3 ){
                                 	singleDeviceFrame.Receive( Arrays.copyOfRange(packet.getData(), 0,packet.getLength()), packet,sessions);
@@ -204,8 +191,8 @@ public class UdpBroadcast {
 											if(sDevFrame != entry.getValue()){
 												sDevFrame = entry.getValue();
 											}
-										/*	if(System.currentTimeMillis()-LastTime<100){																					
-											}else{*/
+										*//*	if(System.currentTimeMillis()-LastTime<100){
+											}else{*//*
 												getTime++;
 												System.out.println("获得次数"+getTime);
 												LastTime = System.currentTimeMillis();
@@ -214,7 +201,7 @@ public class UdpBroadcast {
 										}
 									}
 									
-								}
+								}*/
 
 							}
 							String rcvd = "Received from "
