@@ -9,19 +9,30 @@ import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
+import android.widget.Toast;
+
+import java.net.DatagramPacket;
+import java.net.SocketException;
 
 import example.ldgd.com.tongchuandevicepolling.R;
 import example.ldgd.com.tongchuandevicepolling.activity.MainActivity;
+import example.ldgd.com.tongchuandevicepolling.basic.SecondProtocol;
+import example.ldgd.com.tongchuandevicepolling.interfaces.PacketRec;
+import example.ldgd.com.tongchuandevicepolling.net.UdpBroadcast;
 
 /**
  * Created by ldgd on 2018/5/22.
  */
 
-public class DeviceService extends Service {
-
+public class DeviceService extends Service implements PacketRec {
 
     private static final int NOTIFY_ID = 10;
+
+    private UdpBroadcast broadcast = UdpBroadcast.getInstance();
+    private String broadcastIP = "255.255.255.255";
+    private int udpPort = 9988;
+    private int port = 2222;
+    private boolean broadcastStart = false;
 
     @Nullable
     @Override
@@ -33,8 +44,38 @@ public class DeviceService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // 设置为前台进程
         useForeground("铜川设备轮询服务开启，每45分钟轮询一次！","铜川设备轮询服务开启，每45分钟轮询一次！");
+
+        // 开启UDP服务
+        startUdpService();
+
+        // 保证进程不那么容易被杀死
         flags = START_STICKY;
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    /**
+     *  开启udp服务
+     */
+    private void startUdpService() {
+        broadcast.stop();
+        try {
+
+            byte[] data = SecondProtocol.initialize;
+
+            broadcast.searchDevice(broadcastIP, port, udpPort,
+                    this, data);
+
+            broadcastStart = true;
+        } catch (SocketException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+            showToast("服务开启失败，可能端口被占用");
+            broadcastStart = false;
+        }
+
+    }
+    private void showToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -137,10 +178,13 @@ public class DeviceService extends Service {
 
         Intent intent = new Intent("com.ldgd.service.destroy");
         sendBroadcast(intent);
-        Log.e("xxx", "Override\n" +
-                "    public void onDestroy");
         super.onDestroy();
         // 关闭前台进程
         stopForeground(true);
+    }
+
+    @Override
+    public void Receive(byte[] data, DatagramPacket packet, int session) {
+
     }
 }

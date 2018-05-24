@@ -44,6 +44,7 @@ public class UdpBroadcast {
 	public void searchDevice(String broadcastIp, int broadcastPort,
 			int udpPort, final PacketRec packetFrame, byte[] data)
 			throws SocketException {
+
 		this.packetFrame = packetFrame;
 		detectSocket = new DatagramSocket(udpPort);
 		// Send packet thread
