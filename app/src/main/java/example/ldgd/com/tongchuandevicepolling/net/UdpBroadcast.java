@@ -58,7 +58,6 @@ public class UdpBroadcast {
         // Send packet thread
         System.out.println("Send thread started.");
         try {
-
             byte[] buf = new byte[1024];
 
             int packetPort = broadcastPort;
@@ -82,7 +81,6 @@ public class UdpBroadcast {
 
                     detectSocket.send(out);
                     LogUtil.e("detectSocket.send(out);  成功");
-                   // getdata();
                     rec = new Receive();
                     thread = new Thread(rec);
                     thread.start();
@@ -95,42 +93,7 @@ public class UdpBroadcast {
 
     }
 
-  /*  private void getdata() {
 
-
-        new Thread() {
-            public void run() {
-                while (true) {
-                    *//*try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }*//*
-                    try {
-
-                        DatagramSocket dgSocket = null;
-                        int port = 12345;
-                        if (dgSocket == null) {
-                            dgSocket = new DatagramSocket(null);
-                            dgSocket.setReuseAddress(true);
-                            dgSocket.bind(new InetSocketAddress(2222));
-                        }
-                        byte[] by = new byte[1024];
-                        DatagramPacket packet = new DatagramPacket(by, by.length);
-                        dgSocket.receive(packet);
-                        LogUtil.e("接收到的数据为：" );
-                        String str = new String(packet.getData(), 0, packet.getLength());
-                        System.out.println("接收到的数据为：" + str);
-                        Log.v("WANGRUI", "已获取服务器端发过来的数据。。。。。" + str);
-                    } catch (SocketException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }.start();
-    }*/
 
 
     public void stop() {
@@ -195,6 +158,7 @@ public class UdpBroadcast {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
                 try {
+                    LogUtil.e( "  detectSocket.receive(packet)......." );
                     detectSocket.receive(packet);
                     byte[] data = packet.getData();
                     LogUtil.e("packet.getLength() = " + packet.getLength());
@@ -242,7 +206,7 @@ public class UdpBroadcast {
 								if (mapSingles == null) {
 									// packetFrame.Receive(new
 									// byte[]{0},null,1);
-								} else {							
+								} else {
 									Set<Entry<String, SingleLightSingleJFrame>> entrySet = mapSingles
 											.entrySet();
 									for (Entry<String, SingleLightSingleJFrame> entry : entrySet) {
@@ -259,7 +223,7 @@ public class UdpBroadcast {
 										//	}
 										}
 									}
-									
+
 								}*/
 
                         }

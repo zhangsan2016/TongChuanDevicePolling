@@ -30,7 +30,6 @@ public class MainActivity extends Activity {
 
 
 
-
         // 开启服务
         Intent deviceService = new Intent(this, DeviceService.class);
         startService(deviceService);
