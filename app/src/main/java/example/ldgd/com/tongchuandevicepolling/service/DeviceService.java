@@ -9,10 +9,13 @@ import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,10 +33,14 @@ import example.ldgd.com.tongchuandevicepolling.basic.BasicSendType;
 import example.ldgd.com.tongchuandevicepolling.basic.SecondProtocol;
 import example.ldgd.com.tongchuandevicepolling.bean.HeartBeatBean;
 import example.ldgd.com.tongchuandevicepolling.interfaces.PacketRec;
+import example.ldgd.com.tongchuandevicepolling.net.GetIp;
 import example.ldgd.com.tongchuandevicepolling.net.UdpBroadcast;
 import example.ldgd.com.tongchuandevicepolling.rotocol.ToLowComOrder;
 import example.ldgd.com.tongchuandevicepolling.util.Converter;
+import example.ldgd.com.tongchuandevicepolling.util.LogUtil;
 import example.ldgd.com.tongchuandevicepolling.util.MyHttpRequest;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by ldgd on 2018/5/22.
@@ -45,9 +52,13 @@ public class DeviceService extends Service implements PacketRec {
 
     private UdpBroadcast broadcast = UdpBroadcast.getInstance();
     private String broadcastIP = "255.255.255.255";
+   // private String broadcastIP = "172.23.255.255";
+
     private int udpPort = 9988;
     private int port = 2222;
+    private InetAddress localHostLANAddress;
     private boolean broadcastStart = false;
+    private String subNetMask;  // 子网掩码
     /**
      * 格式化小数
      */
@@ -59,6 +70,8 @@ public class DeviceService extends Service implements PacketRec {
      * value：heartBeatBean
      */
     private Map<Integer, HeartBeatBean> mapHeartBean = new HashMap<Integer, HeartBeatBean>();
+
+
 
     @Nullable
     @Override
@@ -86,6 +99,17 @@ public class DeviceService extends Service implements PacketRec {
         broadcast.stop();
         try {
 
+            // TODO Auto-generated method stub
+            try {
+                localHostLANAddress = GetIp.getLocalHostLANAddress();
+            } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+         //   localIp = localHostLANAddress.getHostAddress();
+//            subNetMask = GetIp.getSubNetWay(localHostLANAddress);
+            //broadcastIP = GetIp.getBroadcastAddress(localIp, subNetMask);
+
             byte[] data = SecondProtocol.initialize;
 
             broadcast.searchDevice(broadcastIP, port, udpPort,
@@ -94,7 +118,7 @@ public class DeviceService extends Service implements PacketRec {
             broadcastStart = true;
 
             // 开启轮询,获取设备信息上传到数据库
-            startPolling((45 * 60 * 1000));
+          //  startPolling((45 * 60 * 1000));
 
         } catch (SocketException e1) {
             // TODO Auto-generated catch block
@@ -289,7 +313,9 @@ public class DeviceService extends Service implements PacketRec {
         int port = packet.getPort();
         byte order = data[1];
 
-        System.out.println("PollingMonitoringJFrame2" + "Receive = " + ip + ":"
+//        System.out.println("PollingMonitoringJFrame2" + "Receive = " + ip + ":"
+//                + port + "" + Arrays.toString(data));
+        LogUtil.e("PollingMonitoringJFrame2" + "Receive = " + ip + ":"
                 + port + "" + Arrays.toString(data));
 
         if (order == (SecondProtocol.hbeat | SecondProtocol.needReturn)) { // 判断命令是不是心跳包
@@ -323,6 +349,7 @@ public class DeviceService extends Service implements PacketRec {
                         b.setIp(ip);
                         b.setSerial(Serial);
                         mapHeartBean.put(row, b);
+                        Log.e(TAG, "Receive:listHeartBean  = " + listHeartBean.size() );
 
                     }
                     try {
