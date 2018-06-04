@@ -48,6 +48,7 @@ public class UdpBroadcast {
      * @param broadcastIp ：广播的ip地址 broadcastPort: 广播的port []data:6个字节 。
      *                    前面四个字节是本机IP，后面两个字节是端口号（用于TCP通信）
      * @category udp广播 检索设备
+     *   225   2222  8899
      **/
     public void searchDevice(String broadcastIp, int broadcastPort,
                              int udpPort, final PacketRec packetFrame, byte[] data)
@@ -68,7 +69,6 @@ public class UdpBroadcast {
             out = new DatagramPacket(buf, buf.length, hostAddress, packetPort);
             LogUtil.e(Arrays.toString(buf) + ":" + buf.length + "   " + hostAddress + ":" + packetPort);
 
-
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "searchDevice: UnknownHostException = " + e.getMessage().toString());
@@ -81,15 +81,17 @@ public class UdpBroadcast {
 
                     detectSocket.send(out);
                     LogUtil.e("detectSocket.send(out);  成功");
-                    rec = new Receive();
-                    thread = new Thread(rec);
-                    thread.start();
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
 
+        rec = new Receive();
+        thread = new Thread(rec);
+        thread.start();
 
     }
 
