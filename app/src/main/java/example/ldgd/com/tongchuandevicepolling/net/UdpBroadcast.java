@@ -158,7 +158,14 @@ public class UdpBroadcast {
                 //synchronized (detectSocket) {
                 byte[] buf = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
+                try {
+                   // detectSocket = new DatagramSocket(8899);
+                    LogUtil.e("detectSocket.getInetAddress() :" + detectSocket.getInetAddress()
+                            + "  detectSocket.getLocalAddress()"
+                            + detectSocket.getLocalAddress() + " " + packet.getAddress().getHostAddress() +  packet.getPort());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 try {
                     LogUtil.e( "  detectSocket.receive(packet)......." );
                     detectSocket.receive(packet);

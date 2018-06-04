@@ -118,7 +118,7 @@ public class DeviceService extends Service implements PacketRec {
             broadcastStart = true;
 
             // 开启轮询,获取设备信息上传到数据库
-          //  startPolling((45 * 60 * 1000));
+            startPolling((45 * 60 * 1000));
 
         } catch (SocketException e1) {
             // TODO Auto-generated catch block
@@ -137,9 +137,11 @@ public class DeviceService extends Service implements PacketRec {
     private void startPolling(int pollingTime) {
 
         if (broadcastStart) {
+
             timer = new Timer();
             pollingTask = new PollingTask();
             timer.schedule(pollingTask, new Date(), pollingTime);
+
         }else{
             // 关闭定时器
             closeTimer();
@@ -152,6 +154,16 @@ public class DeviceService extends Service implements PacketRec {
 
         @Override
         public void run() {
+
+
+            LogUtil.e("mapHeartBean = " + mapHeartBean.size());
+            if(mapHeartBean.size() == 0){
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
             /**
              * 遍历表格中的每一行，获取参数信息
@@ -174,9 +186,9 @@ public class DeviceService extends Service implements PacketRec {
 
 
     public void traverseRow() {
-
         try {
             byte[] data = ToLowComOrder.getRefreshDev(BasicSendType.SINGLECAST);
+
             if (data != null) {
                 Iterator it = mapHeartBean.entrySet().iterator();
                 while (it.hasNext()) {
