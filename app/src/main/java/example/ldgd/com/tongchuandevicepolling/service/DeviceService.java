@@ -76,6 +76,11 @@ public class DeviceService extends Service implements PacketRec {
      */
     private Callback callback;
 
+    /**
+     *  轮询时间
+     *  45 * 60 * 1000
+     */
+    private int pollingTime = 5 * 60 * 1000;
 
 
     @Nullable
@@ -104,6 +109,12 @@ public class DeviceService extends Service implements PacketRec {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+        getStringMsg();
+    }
+
     /**
      * 开启udp服务
      */
@@ -130,7 +141,9 @@ public class DeviceService extends Service implements PacketRec {
             broadcastStart = true;
 
             // 开启轮询,获取设备信息上传到数据库
-            startPolling((45 * 60 * 1000));
+           // startPolling((45 * 60 * 1000));
+
+            startPolling(pollingTime);
 
         } catch (SocketException e1) {
             // TODO Auto-generated catch block
@@ -152,9 +165,12 @@ public class DeviceService extends Service implements PacketRec {
 
         if (broadcastStart) {
 
-            timer = new Timer();
-            pollingTask = new PollingTask();
-            timer.schedule(pollingTask, new Date(), pollingTime);
+            closeTimer();
+            if(timer == null){
+                timer = new Timer();
+                pollingTask = new PollingTask();
+                timer.schedule(pollingTask, new Date(), pollingTime);
+            }
 
         } else {
             // 关闭定时器
@@ -576,6 +592,24 @@ public class DeviceService extends Service implements PacketRec {
 
             }).start();
 
+        }
+
+    }
+
+    public void getStringMsg(){
+
+        // 回调Activity更新界面
+        if (callback != null) {
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");// HH:mm:ss
+            //获取当前时间
+            Date date = new Date(System.currentTimeMillis());
+
+            String  retS = " 当前时间："
+                    + simpleDateFormat.format(date) + "\n "
+                    +"当前数据条目 ： " + mapHeartBean.size() + "\n "
+                    + "当前轮询数：" + pollingCount;
+            callback.onDataChange(retS);
         }
 
     }

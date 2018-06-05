@@ -21,11 +21,12 @@ import java.net.UnknownHostException;
 
 import example.ldgd.com.tongchuandevicepolling.R;
 import example.ldgd.com.tongchuandevicepolling.service.DeviceService;
+import example.ldgd.com.tongchuandevicepolling.util.LogUtil;
 
 public class MainActivity extends Activity {
 
 
- //   private WifiManager.MulticastLock multicastLock;
+    //   private WifiManager.MulticastLock multicastLock;
     private TextView tv_msg;
 
     private Handler upHander = new Handler() {
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-           String msgS = msg.obj.toString();
+            String msgS = msg.obj.toString();
             tv_msg.setText(msgS);
 
 
@@ -56,15 +57,19 @@ public class MainActivity extends Activity {
         this.bindService(deviceService, mConnection, Context.BIND_AUTO_CREATE);
         this.startService(deviceService);
 
+        if(myService != null){
+            LogUtil.e(myService + "被调用");
+            myService.getStringMsg();
+        }
 
     }
 
 
-    private Object mService;
+    private DeviceService myService;
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             DeviceService.Binder binder = (DeviceService.Binder) service;
-            DeviceService myService = binder.getService();
+            myService = binder.getService();
             myService.setCallback(new DeviceService.Callback() {
                 @Override
                 public void onDataChange(String data) {
@@ -76,7 +81,7 @@ public class MainActivity extends Activity {
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            mService = null;
+        //    myService = null;
         }
     };
 
