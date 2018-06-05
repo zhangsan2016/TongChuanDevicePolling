@@ -89,6 +89,7 @@ public class DeviceService extends Service implements PacketRec {
 
         // 保证进程不那么容易被杀死
         flags = START_STICKY;
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -327,8 +328,11 @@ public class DeviceService extends Service implements PacketRec {
 
 //        System.out.println("PollingMonitoringJFrame2" + "Receive = " + ip + ":"
 //                + port + "" + Arrays.toString(data));
-        LogUtil.e("PollingMonitoringJFrame2" + "Receive = " + ip + ":"
+
+
+        LogUtil.e("deviceServiceReceive = " + ip + ":"
                 + port + "" + Arrays.toString(data));
+
 
         if (order == (SecondProtocol.hbeat | SecondProtocol.needReturn)) { // 判断命令是不是心跳包
             SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
@@ -531,7 +535,7 @@ public class DeviceService extends Service implements PacketRec {
                         String getUrl = "http://121.40.194.91:8080/ExhibitionCameraDisplay/InsertDeviceParameterAction";
 
                         String res = MyHttpRequest.sendGet(getUrl, parames, "utf-8");
-                        // System.out.println("Get请求2:"+ res);
+                        LogUtil.e("Get请求2:"+ res);
 
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
@@ -542,7 +546,7 @@ public class DeviceService extends Service implements PacketRec {
 
                 }
 
-            });
+            }).start();
 
         }
 

@@ -28,7 +28,7 @@ public class UdpBroadcast {
     /**
      * 单灯设备界面
      */
-    private PacketRec singleDeviceFrame;
+    private PacketRec mainAct;
     DatagramPacket out;
     long LastTime = 0;
     int getTime = 0;
@@ -158,20 +158,12 @@ public class UdpBroadcast {
                 //synchronized (detectSocket) {
                 byte[] buf = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                try {
-                   // detectSocket = new DatagramSocket(8899);
-                    LogUtil.e("detectSocket.getInetAddress() :" + detectSocket.getInetAddress()
-                            + "  detectSocket.getLocalAddress()"
-                            + detectSocket.getLocalAddress() + " " + packet.getAddress().getHostAddress() +  packet.getPort());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+
                 try {
                     LogUtil.e( "  detectSocket.receive(packet)......." );
                     detectSocket.receive(packet);
                     byte[] data = packet.getData();
                     LogUtil.e("packet.getLength() = " + packet.getLength());
-                    //	System.out.println("packet.getLength() = " + packet.getLength());
 
 
                     if (packet.getLength() > 5) {
@@ -179,7 +171,7 @@ public class UdpBroadcast {
                         byte[] getData = Arrays
                                 .copyOfRange(packet.getData(), 6,
                                         packet.getLength() - 3);
-                        System.out.println("校验的数据:"
+                        LogUtil.e("校验的数据:"
                                 + Arrays.toString(getData));
                         byte[] getCrc = Arrays.copyOfRange(
                                 packet.getData(), packet.getLength() - 3,
@@ -188,7 +180,7 @@ public class UdpBroadcast {
                         int calcCRC = Converter.bytesToInt2(CheckCRC
                                 .crc(getData));
                         if (getCRC == calcCRC) {
-                            System.out.println("CRC校验成功");
+                          LogUtil.e("CRC校验成功");
                         }
                         byte[] session = new byte[]{data[2], data[3]};
                         int sessions = Converter.bytesToInt2(session);
@@ -207,6 +199,8 @@ public class UdpBroadcast {
 								System.out.println("packetFrame = SingleDeviceFrame"  );
 							}*/
                         } else {
+
+                            mainAct.Receive( Arrays.copyOfRange(packet.getData(),0,packet.getLength()),packet,sessions);
                                /* if(data[8]== BasicProtocol.FunctionType.reREADALARMSTATUS ){
                                     packetFrame.Receive( Arrays.copyOfRange(packet.getData(), 0,packet.getLength()), packet,sessions);
                                 }else if(data[8] == 3 ){
@@ -268,7 +262,7 @@ public class UdpBroadcast {
         // TODO Auto-generated method stub
         try {
             // 设置调用对象，方便回调返回信息
-            this.singleDeviceFrame = packetFrame;
+            this.mainAct = packetFrame;
             InetAddress hostAddress;
             hostAddress = InetAddress.getByName(ip);
             out = new DatagramPacket(allData,

@@ -29,7 +29,6 @@ public class MainActivity extends Activity {
         // 获取6.0权限
 
 
-
         // 开启服务
         Intent deviceService = new Intent(this, DeviceService.class);
         startService(deviceService);
