@@ -3,8 +3,6 @@ package example.ldgd.com.tongchuandevicepolling.application;
 import android.app.Application;
 import android.net.wifi.WifiManager;
 
-import example.ldgd.com.tongchuandevicepolling.util.LogUtil;
-
 /**
  * Created by ldgd on 2018/6/1.
  */
@@ -17,7 +15,7 @@ public class MyApplication extends Application {
         super.onCreate();
 
         // 不显示报警数据
-        LogUtil.allowE = false;
+    //    LogUtil.allowE = false;
 
     /*    WifiManager manager = (WifiManager) this
                 .getSystemService(Context.WIFI_SERVICE);

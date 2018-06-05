@@ -52,7 +52,7 @@ public class DeviceService extends Service implements PacketRec {
 
     private UdpBroadcast broadcast = UdpBroadcast.getInstance();
     private String broadcastIP = "255.255.255.255";
-   // private String broadcastIP = "172.23.255.255";
+    // private String broadcastIP = "172.23.255.255";
 
     private int udpPort = 9988;
     private int port = 2222;
@@ -71,12 +71,23 @@ public class DeviceService extends Service implements PacketRec {
      */
     private Map<Integer, HeartBeatBean> mapHeartBean = new HashMap<Integer, HeartBeatBean>();
 
+    /**
+     * 回调函数
+     */
+    private Callback callback;
+
 
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return new Binder();
+    }
+
+    public class Binder extends android.os.Binder {
+        public DeviceService getService() {
+            return DeviceService.this;
+        }
     }
 
     @Override
@@ -107,7 +118,7 @@ public class DeviceService extends Service implements PacketRec {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-         //   localIp = localHostLANAddress.getHostAddress();
+            //   localIp = localHostLANAddress.getHostAddress();
 //            subNetMask = GetIp.getSubNetWay(localHostLANAddress);
             //broadcastIP = GetIp.getBroadcastAddress(localIp, subNetMask);
 
@@ -134,6 +145,8 @@ public class DeviceService extends Service implements PacketRec {
      */
     private Timer timer;
     private PollingTask pollingTask;
+    // 轮询次数
+    private int pollingCount;
 
     private void startPolling(int pollingTime) {
 
@@ -143,7 +156,7 @@ public class DeviceService extends Service implements PacketRec {
             pollingTask = new PollingTask();
             timer.schedule(pollingTask, new Date(), pollingTime);
 
-        }else{
+        } else {
             // 关闭定时器
             closeTimer();
         }
@@ -158,7 +171,7 @@ public class DeviceService extends Service implements PacketRec {
 
 
             LogUtil.e("mapHeartBean = " + mapHeartBean.size());
-            if(mapHeartBean.size() == 0){
+            if (mapHeartBean.size() == 0) {
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
@@ -199,6 +212,7 @@ public class DeviceService extends Service implements PacketRec {
                     broadcast.sendData(beatBean.getIp(),
                             Integer.valueOf(port), data,
                             DeviceService.this);
+                    pollingCount++;
                 }
 
             }
@@ -365,7 +379,7 @@ public class DeviceService extends Service implements PacketRec {
                         b.setIp(ip);
                         b.setSerial(Serial);
                         mapHeartBean.put(row, b);
-                        Log.e(TAG, "Receive:listHeartBean  = " + listHeartBean.size() );
+                        Log.e(TAG, "Receive:listHeartBean  = " + listHeartBean.size());
 
                     }
                     try {
@@ -535,7 +549,21 @@ public class DeviceService extends Service implements PacketRec {
                         String getUrl = "http://121.40.194.91:8080/ExhibitionCameraDisplay/InsertDeviceParameterAction";
 
                         String res = MyHttpRequest.sendGet(getUrl, parames, "utf-8");
-                        LogUtil.e("Get请求2:"+ res);
+                        LogUtil.e("Get请求2:" + res);
+
+                        // 回调Activity更新界面
+                        if (callback != null) {
+
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");// HH:mm:ss
+                            //获取当前时间
+                            Date date = new Date(System.currentTimeMillis());
+
+                            String  retS = " 当前时间："
+                                    + simpleDateFormat.format(date) + "\n "
+                                    +"当前数据条目 ： " + mapHeartBean.size() + "\n "
+                                    + "当前轮询数：" + pollingCount;
+                                    callback.onDataChange(retS);
+                        }
 
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
@@ -550,5 +578,14 @@ public class DeviceService extends Service implements PacketRec {
 
         }
 
+    }
+
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    public static interface Callback {
+        void onDataChange(String data);
     }
 }
