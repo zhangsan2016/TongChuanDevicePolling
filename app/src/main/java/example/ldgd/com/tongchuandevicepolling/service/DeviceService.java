@@ -578,7 +578,7 @@ public class DeviceService extends Service implements PacketRec {
                                     + simpleDateFormat.format(date) + "\n "
                                     +"当前数据条目 ： " + mapHeartBean.size() + "\n "
                                     + "当前轮询数：" + pollingCount;
-                                    callback.onDataChange(retS);
+                                    callback.onDataChange(retS,);
                         }
 
                     } catch (Exception e) {
@@ -609,7 +609,7 @@ public class DeviceService extends Service implements PacketRec {
                     + simpleDateFormat.format(date) + "\n "
                     +"当前数据条目 ： " + mapHeartBean.size() + "\n "
                     + "当前轮询数：" + pollingCount;
-            callback.onDataChange(retS);
+            callback.onDataChange(retS,MainActivity.STRING_MESSAGE);
         }
 
     }
@@ -620,6 +620,6 @@ public class DeviceService extends Service implements PacketRec {
     }
 
     public static interface Callback {
-        void onDataChange(String data);
+        void onDataChange(String data,int functionId);
     }
 }

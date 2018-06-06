@@ -24,6 +24,14 @@ import example.ldgd.com.tongchuandevicepolling.service.DeviceService;
 
 public class MainActivity extends Activity {
 
+    /**
+     * 字符串消息
+     */
+    public static final int STRING_MESSAGE = 10;
+    /**
+     * 重启设备
+     */
+    public static final int RESTART_DEVICE = 11;
 
     //   private WifiManager.MulticastLock multicastLock;
     private TextView tv_msg;
@@ -33,8 +41,14 @@ public class MainActivity extends Activity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            String msgS = msg.obj.toString();
-            tv_msg.setText(msgS);
+            int functionId = msg.what;
+            if (functionId == STRING_MESSAGE) {
+                String msgS = msg.obj.toString();
+                tv_msg.setText(msgS);
+            } else if (functionId == RESTART_DEVICE) {
+                String[] arrayRestart = {"su", "-c", "reboot"};
+                closePhone(MainActivity.this, arrayRestart);
+            }
 
 
         }
@@ -66,16 +80,18 @@ public class MainActivity extends Activity {
             myService = binder.getService();
             myService.setCallback(new DeviceService.Callback() {
                 @Override
-                public void onDataChange(String data) {
+                public void onDataChange(String data, int functionId) {
                     Message msg = new Message();
                     msg.obj = data;
+                    msg.what = functionId;
                     upHander.sendMessage(msg);
                 }
+
             });
         }
 
         public void onServiceDisconnected(ComponentName className) {
-        //    myService = null;
+            //    myService = null;
         }
     };
 
