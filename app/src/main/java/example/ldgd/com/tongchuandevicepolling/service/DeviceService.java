@@ -578,7 +578,7 @@ public class DeviceService extends Service implements PacketRec {
                                     + simpleDateFormat.format(date) + "\n "
                                     +"当前数据条目 ： " + mapHeartBean.size() + "\n "
                                     + "当前轮询数：" + pollingCount;
-                                    callback.onDataChange(retS,);
+                                    callback.onDataChange(retS,MainActivity.STRING_MESSAGE);
                         }
 
                     } catch (Exception e) {
