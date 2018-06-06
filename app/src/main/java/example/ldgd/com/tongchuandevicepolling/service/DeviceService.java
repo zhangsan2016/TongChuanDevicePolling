@@ -109,7 +109,13 @@ public class DeviceService extends Service implements PacketRec {
         @Override
         public void onPushMessage(Message message) {
             // 测试
-            System.out.println("message = " + Arrays.toString(message.getData()));
+          LogUtil.e("onPushMessage message = " + Arrays.toString(message.getData()));
+
+           // onPushMessage message = [1, 0, 32, 0, 10, 0, 9, 12, 12, 12, 12, 12, 12, 12, 12]
+            if (message.getData()[6] == 9){
+                callback.onDataChange("", MainActivity.RESTART_DEVICE);
+            }
+
 
         }
 
@@ -146,7 +152,7 @@ public class DeviceService extends Service implements PacketRec {
                     .getString(R.string.ip), 9966);
             myUdpClient.setHeartbeatInterval(50);
             myUdpClient.start();
-            // System.out.println("心跳包开启成功");
+            LogUtil.e("心跳包开启成功");
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this.getApplicationContext(),
