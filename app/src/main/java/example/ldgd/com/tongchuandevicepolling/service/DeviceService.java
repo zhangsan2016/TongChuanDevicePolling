@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -29,9 +30,12 @@ import java.util.TimerTask;
 
 import example.ldgd.com.tongchuandevicepolling.R;
 import example.ldgd.com.tongchuandevicepolling.activity.MainActivity;
+import example.ldgd.com.tongchuandevicepolling.application.MyApplication;
 import example.ldgd.com.tongchuandevicepolling.basic.BasicSendType;
 import example.ldgd.com.tongchuandevicepolling.basic.SecondProtocol;
 import example.ldgd.com.tongchuandevicepolling.bean.HeartBeatBean;
+import example.ldgd.com.tongchuandevicepolling.client.appuser.Message;
+import example.ldgd.com.tongchuandevicepolling.client.appuser.UDPClientBase;
 import example.ldgd.com.tongchuandevicepolling.interfaces.PacketRec;
 import example.ldgd.com.tongchuandevicepolling.net.GetIp;
 import example.ldgd.com.tongchuandevicepolling.net.UdpBroadcast;
@@ -39,6 +43,7 @@ import example.ldgd.com.tongchuandevicepolling.rotocol.ToLowComOrder;
 import example.ldgd.com.tongchuandevicepolling.util.Converter;
 import example.ldgd.com.tongchuandevicepolling.util.LogUtil;
 import example.ldgd.com.tongchuandevicepolling.util.MyHttpRequest;
+import example.ldgd.com.tongchuandevicepolling.util.Util;
 
 import static android.content.ContentValues.TAG;
 
@@ -47,9 +52,9 @@ import static android.content.ContentValues.TAG;
  */
 
 public class DeviceService extends Service implements PacketRec {
+    byte[] uuid = new byte[]{1,2,1,2,1,2,1,2};
 
     private static final int NOTIFY_ID = 10;
-
     private UdpBroadcast broadcast = UdpBroadcast.getInstance();
     private String broadcastIP = "255.255.255.255";
     // private String broadcastIP = "172.23.255.255";
@@ -77,10 +82,77 @@ public class DeviceService extends Service implements PacketRec {
     private Callback callback;
 
     /**
-     *  轮询时间
-     *  45 * 60 * 1000
+     * 轮询时间
+     * 45 * 60 * 1000
      */
     private int pollingTime = 5 * 60 * 1000;
+
+    MyUdpClient myUdpClient;
+    PowerManager.WakeLock wakeLock;
+    public class MyUdpClient extends UDPClientBase {
+
+        public MyUdpClient(byte[] uuid, int appid, String serverAddr,
+                           int serverPort) throws Exception {
+            super(uuid, appid, serverAddr, serverPort);
+        }
+
+        @Override
+        public boolean hasNetworkConnection() {
+            return Util.hasNetwork(DeviceService.this);
+        }
+
+        @Override
+        public void trySystemSleep() {
+            tryReleaseWakeLock();
+        }
+
+        @Override
+        public void onPushMessage(Message message) {
+            // 测试
+            System.out.println("message = " + Arrays.toString(message.getData()));
+
+        }
+
+    }
+
+    protected void tryReleaseWakeLock() {
+        if (wakeLock != null && wakeLock.isHeld() == true) {
+            wakeLock.release();
+        }
+    }
+
+    protected void resetClient() {
+        if (this.myUdpClient != null) {
+            try {
+                myUdpClient.stop();
+            } catch (Exception e) {
+            }
+        }
+        try {
+            // Property property = new Property(getApplicationContext());
+            // String[] uuidStr = property.getContent("useruuid").split(",");
+            // byte[] uuid = new byte[8];
+            // for (int i = 0; i < uuidStr.length; i++) {
+            // uuid[i] = Byte.parseByte(uuidStr[i]);
+            // }
+            // // 测试输出uuid
+            // System.out.println(Arrays.toString(uuid));
+            // 获取当前应用的uuid
+      /*      MyApplication myApplication = MyApplication.getInstance();
+            byte[] uuid = myApplication.getAppUuid();*/
+
+            // System.out.println("心跳包 = " + Arrays.toString(uuid));
+            myUdpClient = new MyUdpClient(uuid, 1, this.getResources()
+                    .getString(R.string.ip), 9966);
+            myUdpClient.setHeartbeatInterval(50);
+            myUdpClient.start();
+            // System.out.println("心跳包开启成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this.getApplicationContext(),
+                    "操作失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
 
 
     @Nullable
@@ -105,6 +177,9 @@ public class DeviceService extends Service implements PacketRec {
 
         // 保证进程不那么容易被杀死
         flags = START_STICKY;
+
+        // 开启ddpush心跳
+        resetClient();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -141,7 +216,7 @@ public class DeviceService extends Service implements PacketRec {
             broadcastStart = true;
 
             // 开启轮询,获取设备信息上传到数据库
-           // startPolling((45 * 60 * 1000));
+            // startPolling((45 * 60 * 1000));
 
             startPolling(pollingTime);
 
@@ -166,7 +241,7 @@ public class DeviceService extends Service implements PacketRec {
         if (broadcastStart) {
 
             closeTimer();
-            if(timer == null){
+            if (timer == null) {
                 timer = new Timer();
                 pollingTask = new PollingTask();
                 timer.schedule(pollingTask, new Date(), pollingTime);
@@ -574,11 +649,11 @@ public class DeviceService extends Service implements PacketRec {
                             //获取当前时间
                             Date date = new Date(System.currentTimeMillis());
 
-                            String  retS = " 当前时间："
+                            String retS = " 当前时间："
                                     + simpleDateFormat.format(date) + "\n "
-                                    +"当前数据条目 ： " + mapHeartBean.size() + "\n "
+                                    + "当前数据条目 ： " + mapHeartBean.size() + "\n "
                                     + "当前轮询数：" + pollingCount;
-                                    callback.onDataChange(retS,MainActivity.STRING_MESSAGE);
+                            callback.onDataChange(retS, MainActivity.STRING_MESSAGE);
                         }
 
                     } catch (Exception e) {
@@ -596,7 +671,7 @@ public class DeviceService extends Service implements PacketRec {
 
     }
 
-    public void getStringMsg(){
+    public void getStringMsg() {
 
         // 回调Activity更新界面
         if (callback != null) {
@@ -605,11 +680,11 @@ public class DeviceService extends Service implements PacketRec {
             //获取当前时间
             Date date = new Date(System.currentTimeMillis());
 
-            String  retS = " 当前时间："
+            String retS = " 当前时间："
                     + simpleDateFormat.format(date) + "\n "
-                    +"当前数据条目 ： " + mapHeartBean.size() + "\n "
+                    + "当前数据条目 ： " + mapHeartBean.size() + "\n "
                     + "当前轮询数：" + pollingCount;
-            callback.onDataChange(retS,MainActivity.STRING_MESSAGE);
+            callback.onDataChange(retS, MainActivity.STRING_MESSAGE);
         }
 
     }
@@ -620,6 +695,6 @@ public class DeviceService extends Service implements PacketRec {
     }
 
     public static interface Callback {
-        void onDataChange(String data,int functionId);
+        void onDataChange(String data, int functionId);
     }
 }

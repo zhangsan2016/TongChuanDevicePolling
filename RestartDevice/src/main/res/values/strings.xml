@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">TongChuanDevicePolling</string>
-
+    <string name="app_name">RestartDevice</string>
     <string name="ip">121.40.194.91</string>
 </resources>
