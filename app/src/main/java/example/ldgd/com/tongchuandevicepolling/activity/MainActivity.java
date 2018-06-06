@@ -21,7 +21,6 @@ import java.net.UnknownHostException;
 
 import example.ldgd.com.tongchuandevicepolling.R;
 import example.ldgd.com.tongchuandevicepolling.service.DeviceService;
-import example.ldgd.com.tongchuandevicepolling.util.LogUtil;
 
 public class MainActivity extends Activity {
 
@@ -56,11 +55,6 @@ public class MainActivity extends Activity {
         Intent deviceService = new Intent(this, DeviceService.class);
         this.bindService(deviceService, mConnection, Context.BIND_AUTO_CREATE);
         this.startService(deviceService);
-
-        if(myService != null){
-            LogUtil.e(myService + "被调用");
-            myService.getStringMsg();
-        }
 
     }
 
