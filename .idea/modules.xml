@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/RestartDevice/RestartDevice.iml" filepath="$PROJECT_DIR$/RestartDevice/RestartDevice.iml" />
       <module fileurl="file://$PROJECT_DIR$/TongChuanDevicePolling.iml" filepath="$PROJECT_DIR$/TongChuanDevicePolling.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RestartDevice/restartdevice.iml" filepath="$PROJECT_DIR$/RestartDevice/restartdevice.iml" />
     </modules>
   </component>
 </project>

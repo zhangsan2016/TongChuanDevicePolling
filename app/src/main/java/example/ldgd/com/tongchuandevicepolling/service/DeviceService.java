@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -16,7 +17,6 @@ import android.widget.Toast;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,14 +30,12 @@ import java.util.TimerTask;
 
 import example.ldgd.com.tongchuandevicepolling.R;
 import example.ldgd.com.tongchuandevicepolling.activity.MainActivity;
-import example.ldgd.com.tongchuandevicepolling.application.MyApplication;
 import example.ldgd.com.tongchuandevicepolling.basic.BasicSendType;
 import example.ldgd.com.tongchuandevicepolling.basic.SecondProtocol;
 import example.ldgd.com.tongchuandevicepolling.bean.HeartBeatBean;
 import example.ldgd.com.tongchuandevicepolling.client.appuser.Message;
 import example.ldgd.com.tongchuandevicepolling.client.appuser.UDPClientBase;
 import example.ldgd.com.tongchuandevicepolling.interfaces.PacketRec;
-import example.ldgd.com.tongchuandevicepolling.net.GetIp;
 import example.ldgd.com.tongchuandevicepolling.net.UdpBroadcast;
 import example.ldgd.com.tongchuandevicepolling.rotocol.ToLowComOrder;
 import example.ldgd.com.tongchuandevicepolling.util.Converter;
@@ -208,13 +206,13 @@ public class DeviceService extends Service implements PacketRec {
               broadcast.stop();
               try {
 
-                  // TODO Auto-generated method stub
+           /*       // TODO Auto-generated method stub
                   try {
                       localHostLANAddress = GetIp.getLocalHostLANAddress();
                   } catch (UnknownHostException e) {
                       // TODO Auto-generated catch block
                       e.printStackTrace();
-                  }
+                  }*/
                   //   localIp = localHostLANAddress.getHostAddress();
 //            subNetMask = GetIp.getSubNetWay(localHostLANAddress);
                   //broadcastIP = GetIp.getBroadcastAddress(localIp, subNetMask);
@@ -330,7 +328,10 @@ public class DeviceService extends Service implements PacketRec {
 
 
     private void showToast(String msg) {
+        Looper.prepare();
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+        Looper.loop();
+
     }
 
     @Override
