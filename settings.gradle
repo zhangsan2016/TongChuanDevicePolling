@@ -1,1 +1,1 @@
-include ':app', ':RestartDevice'
+include ':app', ':restartdevice'

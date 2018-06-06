@@ -200,38 +200,46 @@ public class DeviceService extends Service implements PacketRec {
      * 开启udp服务
      */
     private void startUdpService() {
-        broadcast.stop();
-        try {
+      new Thread(){
+          @Override
+          public void run() {
+              super.run();
+              // 先关闭UdpBroadcast
+              broadcast.stop();
+              try {
 
-            // TODO Auto-generated method stub
-            try {
-                localHostLANAddress = GetIp.getLocalHostLANAddress();
-            } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            //   localIp = localHostLANAddress.getHostAddress();
+                  // TODO Auto-generated method stub
+                  try {
+                      localHostLANAddress = GetIp.getLocalHostLANAddress();
+                  } catch (UnknownHostException e) {
+                      // TODO Auto-generated catch block
+                      e.printStackTrace();
+                  }
+                  //   localIp = localHostLANAddress.getHostAddress();
 //            subNetMask = GetIp.getSubNetWay(localHostLANAddress);
-            //broadcastIP = GetIp.getBroadcastAddress(localIp, subNetMask);
+                  //broadcastIP = GetIp.getBroadcastAddress(localIp, subNetMask);
 
-            byte[] data = SecondProtocol.initialize;
+                  byte[] data = SecondProtocol.initialize;
 
-            broadcast.searchDevice(broadcastIP, port, udpPort,
-                    this, data);
+                  broadcast.searchDevice(broadcastIP, port, udpPort,
+                          DeviceService.this, data);
 
-            broadcastStart = true;
+                  broadcastStart = true;
 
-            // 开启轮询,获取设备信息上传到数据库
-            // startPolling((45 * 60 * 1000));
+                  // 开启轮询,获取设备信息上传到数据库
+                  // startPolling((45 * 60 * 1000));
 
-            startPolling(pollingTime);
+                  startPolling(pollingTime);
 
-        } catch (SocketException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            showToast("服务开启失败，可能端口被占用");
-            broadcastStart = false;
-        }
+              } catch (SocketException e1) {
+                  // TODO Auto-generated catch block
+                  e1.printStackTrace();
+                  showToast("服务开启失败，可能端口被占用");
+                  broadcastStart = false;
+              }
+
+          }
+      }.start();
     }
 
     /**
