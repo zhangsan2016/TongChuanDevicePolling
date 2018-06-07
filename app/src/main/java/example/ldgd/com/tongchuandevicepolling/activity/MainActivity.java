@@ -70,6 +70,7 @@ public class MainActivity extends Activity {
         this.bindService(deviceService, mConnection, Context.BIND_AUTO_CREATE);
         this.startService(deviceService);
 
+
     }
 
 
@@ -163,6 +164,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        unbindService(mConnection);
     }
 }

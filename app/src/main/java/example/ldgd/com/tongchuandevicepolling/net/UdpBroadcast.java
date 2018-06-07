@@ -235,7 +235,9 @@ public class UdpBroadcast {
                         System.out.println(rcvd);
                     }
                 } catch (IOException e) {
-                    System.out.println("关闭");
+                    System.out.println(UdpBroadcast.class.getSimpleName() + "#Receive 关闭");
+                    LogUtil.e(UdpBroadcast.class.getSimpleName() + "#Receive 关闭");
+                    e.printStackTrace();
                 }
             }
         }

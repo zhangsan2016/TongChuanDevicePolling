@@ -83,7 +83,7 @@ public class DeviceService extends Service implements PacketRec {
      * 轮询时间
      * 45 * 60 * 1000
      */
-    private int pollingTime = 5 * 60 * 1000;
+    private int pollingTime = 3000;
 
     MyUdpClient myUdpClient;
     PowerManager.WakeLock wakeLock;
@@ -133,19 +133,7 @@ public class DeviceService extends Service implements PacketRec {
             }
         }
         try {
-            // Property property = new Property(getApplicationContext());
-            // String[] uuidStr = property.getContent("useruuid").split(",");
-            // byte[] uuid = new byte[8];
-            // for (int i = 0; i < uuidStr.length; i++) {
-            // uuid[i] = Byte.parseByte(uuidStr[i]);
-            // }
-            // // 测试输出uuid
-            // System.out.println(Arrays.toString(uuid));
-            // 获取当前应用的uuid
-      /*      MyApplication myApplication = MyApplication.getInstance();
-            byte[] uuid = myApplication.getAppUuid();*/
 
-            // System.out.println("心跳包 = " + Arrays.toString(uuid));
             myUdpClient = new MyUdpClient(uuid, 1, this.getResources()
                     .getString(R.string.ip), 9966);
             myUdpClient.setHeartbeatInterval(50);
@@ -154,7 +142,7 @@ public class DeviceService extends Service implements PacketRec {
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this.getApplicationContext(),
-                    "操作失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    "开启心跳包异常：" + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -198,12 +186,15 @@ public class DeviceService extends Service implements PacketRec {
      * 开启udp服务
      */
     private void startUdpService() {
+
+        // 先关闭UdpBroadcast
+        broadcast.stop();
+
       new Thread(){
           @Override
           public void run() {
               super.run();
-              // 先关闭UdpBroadcast
-              broadcast.stop();
+
               try {
 
            /*       // TODO Auto-generated method stub
