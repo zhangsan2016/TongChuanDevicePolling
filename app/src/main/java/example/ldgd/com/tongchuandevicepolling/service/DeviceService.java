@@ -57,7 +57,7 @@ public class DeviceService extends Service implements PacketRec {
     private String broadcastIP = "255.255.255.255";
     // private String broadcastIP = "172.23.255.255";
 
-    private int udpPort = 9988;
+    private int udpPort = 7755;
     private int port = 2222;
     private InetAddress localHostLANAddress;
     private boolean broadcastStart = false;
@@ -161,6 +161,9 @@ public class DeviceService extends Service implements PacketRec {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        LogUtil.e("onStartCommand.....................................................................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
         // 设置为前台进程
         useForeground("铜川设备轮询服务开启，每45分钟轮询一次！", "铜川设备轮询服务开启，每45分钟轮询一次！");
 
@@ -172,6 +175,8 @@ public class DeviceService extends Service implements PacketRec {
 
         // 开启ddpush心跳
         resetClient();
+
+
 
         return super.onStartCommand(intent, flags, startId);
     }

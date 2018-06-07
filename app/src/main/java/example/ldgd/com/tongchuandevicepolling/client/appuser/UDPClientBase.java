@@ -218,6 +218,7 @@ public abstract class UDPClientBase implements Runnable {
 	private void receiveData() throws Exception {
 		DatagramPacket dp = new DatagramPacket(bufferArray, bufferArray.length);
 		ds.setSoTimeout(5 * 1000);
+
 		ds.receive(dp);
 		if (dp.getLength() <= 0 || dp.getData() == null
 				|| dp.getData().length == 0) {
@@ -392,4 +393,5 @@ public abstract class UDPClientBase implements Runnable {
 		}
 
 	}
+
 }
